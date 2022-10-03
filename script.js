@@ -1,5 +1,6 @@
 const inputElement = document.getElementById("inputBox");
 const textElement = document.getElementById("text");
+const statusElement = document.getElementById("status");
 
 var currentRoom;
 
@@ -21,6 +22,15 @@ class Room {
       console.log(`You are now in the ${currentRoom._name}`);
       return this._linkedRooms[direction];
     }
+
+    // Fade in/out transition
+    statusElement.innerText = `Cannot move ${direction}!`;
+    statusElement.style.transition = "none";
+    statusElement.style.opacity = "1";
+    void statusElement.offsetHeight; // Allows us to transition again (for some reason)
+    statusElement.style.transition = "opacity 2s";
+    statusElement.style.opacity = "0";
+
     return currentRoom;
   }
 }
@@ -43,8 +53,9 @@ const Kitchen = new Room(
 
 // TODO: Separate these
 Kitchen.linkRoom("south", Hallway);
-Kitchen.linkRoom("east", Kitchen);
+Kitchen.linkRoom("east", Lounge);
 Hallway.linkRoom("north", Kitchen);
+Lounge.linkRoom("west", Kitchen);
 
 function displayRoomInfo(roomToDisplay) {
   textElement.innerText = roomToDisplay._desc;
