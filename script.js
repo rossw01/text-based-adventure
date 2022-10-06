@@ -243,6 +243,19 @@ function getItemPlacements() {
   }
 }
 
+function displayInv() {
+  let items = Object.keys(inventory); // Keys(names) of all items
+  if (items.length == 0) {
+    // If no items were added...
+    return "You haven't collected any items yet! Try typing 'get (item name)' to pick up an item!";
+  }
+  let invStr = "Inventory: ";
+  items.forEach((item) => {
+    invStr += `${item}, `;
+  });
+  return invStr.slice(0, -2); // cuts off final comma
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.key == "Enter") {
     command = inputElement.value;
@@ -285,8 +298,10 @@ document.addEventListener("keydown", function (event) {
         let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
         currentRoom.open(item.charAt(0).toUpperCase() + item.substring(1));
       }
+    } else if (command == "inventory") {
+      updateDescriptionBox(displayInv());
     } else {
-      alert("That is not a valid command please try again");
+      displayAlert("That is not a valid command please try again");
     }
   }
 });
