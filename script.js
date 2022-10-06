@@ -171,7 +171,7 @@ const Sword = new Item(
   "This has definitely not been used in over a century, it would probably break easily.",
   "There is an old sword mounted on the wall.",
   undefined,
-  "Your sword has broken already! It was probably just for decorative purposes to be fair."
+  "You swing your sword with all your might! You missed and hit the wall. It is now broken."
 );
 
 // Room Setup
@@ -205,7 +205,7 @@ const UpstairsDark = new Room(
 
 const FinalRoom = new Room(
   "Final Room",
-  "There is a goblin here",
+  "The door locks behind you! In front of you there is a big goblin! He looks hungry, Aaaaaaaah!!!",
   "Gold key",
   true
 );
@@ -300,6 +300,53 @@ function displayInv() {
   return invStr.slice(0, -2); // cuts off final comma
 }
 
+function winGame() {
+  updateDescriptionBox(
+    "You throw the apple as hard as you can, it lands in the Goblin's mouth."
+  );
+  updateDescriptionBox(
+    "Goblins are allergic to apples. The Goblin is now dead. 😵"
+  );
+  updateDescriptionBox("You win!");
+  //TODO:
+}
+
+function loseGame() {
+  updateDescriptionBox("The goblin hits you with his weapon");
+  updateDescriptionBox("You are now dead");
+  // TODO: disable input
+}
+
+function throwItem(item) {
+  if (!displayInv().includes(item)) {
+    displayAlert(`I don't have a ${item}!`);
+  }
+  if (currentRoom == FinalRoom && item == "apple") {
+    winGame();
+  }
+  if (currentRoom == FinalRoom && item == "sword") {
+    // Secret!
+    updateDescriptionBox("The goblin catches the sword and crushes it to dust");
+    delete inventory[item];
+  } else {
+    // TODO: drop?
+    displayAlert("I can't throw that!");
+  }
+}
+
+function checkStuck() {
+  if (currentRoom == FinalRoom) {
+    if (
+      !displayInv().toLowerCase().includes("apple") &&
+      !displayInv().toLowerCase().includes("sword")
+    ) {
+      loseGame(); // If went into final room without apple or sword, end game
+    }
+  } else {
+    return;
+  }
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.key == "Enter") {
     command = inputElement.value;
@@ -316,6 +363,7 @@ document.addEventListener("keydown", function (event) {
       // MOVEMENT
       currentRoom = currentRoom.move(command);
       displayRoomName(currentRoom);
+      checkStuck(); // Make sure user isn't in final room without Sword or apple (causes player to get stuck)
     } else if (command.split(" ")[0].toLowerCase() == "get") {
       // GET
       if (command == "get") {
@@ -324,8 +372,15 @@ document.addEventListener("keydown", function (event) {
         let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
         currentRoom.get(item.charAt(0).toUpperCase() + item.substring(1)); // Capitalises first letter of item to get
       }
-      // EXAMINE
+    } else if (command.split(" ")[0].toLowerCase() == "throw") {
+      let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
+      if (command == "throw") {
+        displayAlert("Nothing to throw!");
+      } else {
+        throwItem(item);
+      }
     } else if (command.split(" ")[0].toLowerCase() == "examine") {
+      // EXAMINE
       if (command == "examine") {
         // If user just types examine, nothing else....
         updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room.
@@ -346,15 +401,26 @@ document.addEventListener("keydown", function (event) {
       updateDescriptionBox(displayInv());
     } else if (command.split(" ")[0].toLowerCase() == "use") {
       let itemToUse = command.substring(command.indexOf(" ") + 1).toLowerCase();
-      if (itemToUse == "lantern") {
-        lightRoom();
+      if (!displayInv().toLowerCase().includes(itemToUse)) {
+        displayAlert(`I don't have a ${itemToUse}!`);
       } else {
-        if (displayInv().toLowerCase().includes(itemToUse)) {
-          // User inputted an item that they have that cant be used
-          displayAlert(`I can't use a ${itemToUse}!`);
+        // If you do have the item...
+        if (itemToUse == "lantern") {
+          lightRoom();
+          return;
+        }
+        if (itemToUse == "sword") {
+          if (currentRoom !== FinalRoom) {
+            displayAlert("I cant use that here!");
+          } else {
+            updateDescriptionBox(Sword._onUse);
+            delete inventory["Sword"];
+            if (!displayInv().toLowerCase().includes("apple")) {
+              loseGame();
+            }
+          }
         } else {
-          // User inputted an item that they don't have
-          displayAlert(`I don't have a ${itemToUse}!`);
+          displayAlert("I can't use that!");
         }
       }
     } else {
