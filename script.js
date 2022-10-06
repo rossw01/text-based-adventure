@@ -81,6 +81,7 @@ class Room {
     }
   }
 
+  // TODO: Dont let player pick up something that contains something
   get(item) {
     // if key with item string exists in items...
     console.log("Available items:");
@@ -118,7 +119,7 @@ class Room {
         return this._linkedRooms[direction];
       }
     }
-    displayAlert(`Cannot move ${direction}!`);
+    displayAlert(`Cannot go ${direction}!`);
     return currentRoom;
   }
 }
@@ -126,7 +127,7 @@ class Room {
 // Item Setup
 const Apple = new Item(
   "Apple",
-  "It's red and looks delicous",
+  "It's red and looks delicious. I could eat this or I could throw it at someone I dislike too...",
   "There is a red apple in the fruit bowl."
 );
 const Key = new Item(
@@ -159,16 +160,21 @@ const Hallway = new Room(
   "There is a set of stairs at the back of the darkly lit room"
 );
 
-// TODO: Add this to a new file
 const Kitchen = new Room(
   "Kitchen",
   "You are in the kitchen, there is a table and a countertop"
+);
+
+const UpstairsDark = new Room(
+  "Upstairs",
+  "You creep up the old stairs, once you reach the top you realise everything is too dark to see."
 );
 
 // TODO: Separate these?
 // Item Placement
 Kitchen.placeItem("Red apple", Apple);
 Kitchen.placeItem("Silver key", Key);
+
 Hallway.placeItem("Chest", Chest);
 
 // Room Links
@@ -176,6 +182,9 @@ Kitchen.linkRoom("south", Hallway);
 Kitchen.linkRoom("east", Lounge);
 
 Hallway.linkRoom("north", Kitchen);
+Hallway.linkRoom("upstairs", UpstairsDark);
+
+UpstairsDark.linkRoom("downstairs", Hallway);
 
 Lounge.linkRoom("west", Kitchen);
 
@@ -211,7 +220,14 @@ document.addEventListener("keydown", function (event) {
   if (event.key == "Enter") {
     command = inputElement.value;
     inputElement.value = "";
-    const directions = ["north", "south", "east", "west"];
+    const directions = [
+      "north",
+      "south",
+      "east",
+      "west",
+      "upstairs",
+      "downstairs",
+    ];
     if (directions.includes(command.toLowerCase())) {
       // MOVEMENT
       currentRoom = currentRoom.move(command);
