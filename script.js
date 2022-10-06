@@ -34,12 +34,13 @@ class Item {
 }
 
 class Room {
-  constructor(name, description, requiredItem) {
+  constructor(name, description, requiredItem, isIlluminated) {
     this._name = name;
     this._desc = description;
     this._linkedRooms = {};
     this._items = {};
     this._requiredItem = requiredItem;
+    this._isIlluminated = isIlluminated;
   }
 
   linkRoom(direction, room) {
@@ -51,11 +52,12 @@ class Room {
   }
 
   examine(item) {
-    console.log("Available items in room:");
-    console.log(this._items);
-    console.log("Available items in inventory:");
-    console.log(inventory);
-    console.log(item);
+    // TODO: remove
+    // console.log("Available items in room:");
+    // console.log(this._items);
+    // console.log("Available items in inventory:");
+    // console.log(inventory);
+    // console.log(item);
 
     if (item in inventory) {
       updateDescriptionBox(inventory[item]._desc);
@@ -75,7 +77,7 @@ class Room {
       displayAlert("I can't open that!");
     } else {
       updateDescriptionBox(
-        `There's a ${this._items[item]._contains._name} in this chest! \nThe ${this._items[item]._contains._name} was added to your inventory.`
+        `There's a ${this._items[item]._contains._name} in here! \nThe ${this._items[item]._contains._name} was added to your inventory.`
       );
       addToInventory(this._items[item]._contains);
       delete this._items[item];
@@ -90,7 +92,7 @@ class Room {
     if (item in this._items) {
       displayAlert(`Picked up ${item}!`);
       // TODO: Add item to inventory (not yet implemented)
-      addToInventory(item);
+      addToInventory(this._items[item]);
       delete this._items[item];
       console.log(this._items);
     } else {
@@ -106,10 +108,10 @@ class Room {
       if (
         // If item is required to move in certain direction and you dont have the item....
         typeof this._linkedRooms[direction]._requiredItem !== "undefined" &&
-        !(this._requiredItem in inventory)
+        !(this._linkedRooms[direction]._requiredItem in inventory)
       ) {
         displayAlert(
-          `You are going to need a ${this._linkedRooms[direction]._requiredItem._name} to go in here!`
+          `You are going to need a ${this._linkedRooms[direction]._requiredItem} to go in here!`
         );
         return currentRoom; // Didn't move so we return currentRoom
       } else {
@@ -128,8 +130,8 @@ class Room {
 // Item Setup
 const Apple = new Item(
   "Apple",
-  "It's red and looks delicious. I could eat this or I could throw it at someone I dislike too...",
-  "There is a red apple in the fruit bowl."
+  "It's red and looks delicious. I could eat this but I could throw it at someone I dislike too...",
+  "There is an apple in the fruit bowl."
 );
 const Key = new Item(
   "Silver key",
@@ -149,34 +151,58 @@ const Chest = new Item(
   Key2
 );
 
+const Lantern = new Item(
+  "Lantern",
+  "It looks like it's going to fall apart, but it could probably illuminate a dark room.",
+  "There's a lantern beside the sofa, just like any good Lounge has.",
+  undefined,
+  "The lantern illuminates the room!"
+);
+
+const Cabinet = new Item(
+  "Cabinet",
+  "An old fashioned cabinet, I should probably check out what's inside it",
+  "There is a cabinet beside the door",
+  Lantern
+);
+
 // Room Setup
 const Lounge = new Room(
   "Lounge",
   "You are now in the lounge, there is a big sofa.",
-  Key
+  "Silver key",
+  true
 );
 
 const Hallway = new Room(
   "Hallway",
-  "There is a set of stairs at the back of the darkly lit room"
+  "There is a set of stairs at the back of the darkly lit room",
+  undefined,
+  true
 );
 
 const Kitchen = new Room(
   "Kitchen",
-  "You are in the kitchen, there is a table and a countertop"
+  "You are in the kitchen, there is a table and a countertop",
+  undefined,
+  true
 );
 
 const UpstairsDark = new Room(
   "Upstairs",
-  "You creep up the old stairs, once you reach the top you realise everything is too dark to see."
+  "You creep up the old stairs, once you reach the top you realise everything is too dark to see.",
+  undefined,
+  false
 );
 
 // TODO: Separate these?
 // Item Placement
-Kitchen.placeItem("Red apple", Apple);
+Kitchen.placeItem("Apple", Apple);
 Kitchen.placeItem("Silver key", Key);
 
 Hallway.placeItem("Chest", Chest);
+
+Lounge.placeItem("Cabinet", Cabinet);
 
 // Room Links
 Kitchen.linkRoom("south", Hallway);
