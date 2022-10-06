@@ -21,7 +21,6 @@ function updateDescriptionBox(text) {
 
 function addToInventory(item) {
   inventory[item._name] = item;
-  console.log(inventory);
 }
 
 class Item {
@@ -91,6 +90,8 @@ class Room {
       } else {
         currentRoom = this._linkedRooms[direction];
         updateDescriptionBox(currentRoom._desc);
+        getItemPlacements();
+
         return this._linkedRooms[direction];
       }
     }
@@ -160,6 +161,16 @@ function displayRoomName(roomToDisplay) {
   textElement.innerText = roomToDisplay._name;
 }
 
+function getItemPlacements() {
+  let out = "";
+  for (let item in currentRoom._items) {
+    out += currentRoom._items[item]._placement + "\n";
+  }
+  if (out.trim() !== "") {
+    updateDescriptionBox(out.trim());
+  }
+}
+
 document.addEventListener("keydown", function (event) {
   if (event.key == "Enter") {
     command = inputElement.value;
@@ -180,7 +191,9 @@ document.addEventListener("keydown", function (event) {
       // EXAMINE
     } else if (command.split(" ")[0].toLowerCase() == "examine") {
       if (command == "examine") {
-        updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room
+        updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room.
+        // Updates the description box so long as there are item placement descriptions to be displayed.
+        getItemPlacements();
       } else {
         let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
         currentRoom.examine(item.charAt(0).toUpperCase() + item.substring(1));
