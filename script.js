@@ -25,9 +25,10 @@ function addToInventory(item) {
 }
 
 class Item {
-  constructor(name, description) {
+  constructor(name, description, placement) {
     this._name = name;
     this._desc = description;
+    this._placement = placement;
   }
 }
 
@@ -99,8 +100,16 @@ class Room {
 }
 
 // Item Setup
-const Apple = new Item("Apple", "It's red and looks delicous");
-const Key = new Item("Key", "Unlocks a door");
+const Apple = new Item(
+  "Apple",
+  "It's red and looks delicous",
+  "There is a red apple in the fruit bowl."
+);
+const Key = new Item(
+  "Key",
+  "Unlocks a door",
+  "There is a key on the dining table."
+);
 
 // Room Setup
 const Lounge = new Room(
