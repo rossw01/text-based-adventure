@@ -24,10 +24,11 @@ function addToInventory(item) {
 }
 
 class Item {
-  constructor(name, description, placement) {
+  constructor(name, description, placement, contains) {
     this._name = name;
     this._desc = description;
     this._placement = placement;
+    this._contains = contains;
   }
 }
 
@@ -56,6 +57,22 @@ class Room {
       updateDescriptionBox(this._items[item]._desc);
     } else {
       displayAlert(`Can't find a ${item} to examine!`);
+    }
+  }
+
+  open(item) {
+    if (!(item in this._items)) {
+      // If the item doesnt exist in the room...
+      displayAlert(`${item} doesnt exist!`);
+    } else if (this._items[item]._contains._name == "undefined") {
+      // If unopenable...
+      displayAlert("I can't open that!");
+    } else {
+      updateDescriptionBox(
+        `There's a ${this._items[item]._contains._name} in this chest! \nThe ${this._items[item]._contains._name} was added to your inventory.`
+      );
+      addToInventory(this._items[item]._contains);
+      delete this._items[item];
     }
   }
 
@@ -107,9 +124,21 @@ const Apple = new Item(
   "There is a red apple in the fruit bowl."
 );
 const Key = new Item(
-  "Key",
+  "Silver key",
   "Unlocks a door",
   "There is a key on the dining table."
+);
+
+const Key2 = new Item(
+  "Gold key",
+  "A really expensive looking key, this will probably unlock something"
+);
+
+const Chest = new Item(
+  "Chest",
+  "Maybe it contains something, I should probably open it",
+  "There is a chest in the corner of the room",
+  Key2
 );
 
 // Room Setup
@@ -134,6 +163,7 @@ const Kitchen = new Room(
 // Item Placement
 Kitchen.placeItem("Red apple", Apple);
 Kitchen.placeItem("Key", Key);
+Hallway.placeItem("Chest", Chest);
 
 // Room Links
 Kitchen.linkRoom("south", Hallway);
@@ -191,12 +221,20 @@ document.addEventListener("keydown", function (event) {
       // EXAMINE
     } else if (command.split(" ")[0].toLowerCase() == "examine") {
       if (command == "examine") {
+        // If user just types examine, nothing else....
         updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room.
         // Updates the description box so long as there are item placement descriptions to be displayed.
         getItemPlacements();
       } else {
         let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
         currentRoom.examine(item.charAt(0).toUpperCase() + item.substring(1));
+      }
+    } else if (command.split(" ")[0].toLowerCase() == "open") {
+      if (command == "open") {
+        displayAlert("Nothing to open!");
+      } else {
+        let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
+        currentRoom.open(item.charAt(0).toUpperCase() + item.substring(1));
       }
     } else {
       alert("That is not a valid command please try again");
