@@ -50,10 +50,15 @@ class Room {
   }
 
   examine(item) {
-    console.log("Available items:");
+    console.log("Available items in room:");
     console.log(this._items);
+    console.log("Available items in inventory:");
+    console.log(inventory);
+    console.log(item);
 
-    if (item in this._items) {
+    if (item in inventory) {
+      updateDescriptionBox(inventory[item]._desc);
+    } else if (item in this._items) {
       updateDescriptionBox(this._items[item]._desc);
     } else {
       displayAlert(`Can't find a ${item} to examine!`);
@@ -92,6 +97,7 @@ class Room {
   }
 
   move(direction) {
+    console.log("Available directions: ");
     console.log(this._linkedRooms);
     if (direction in this._linkedRooms) {
       // If room to move to exists
@@ -126,12 +132,12 @@ const Apple = new Item(
 const Key = new Item(
   "Silver key",
   "Unlocks a door",
-  "There is a key on the dining table."
+  "There is a Silver key on the dining table."
 );
 
 const Key2 = new Item(
   "Gold key",
-  "A really expensive looking key, this will probably unlock something"
+  "A really expensive looking key, this will probably unlock something. I hope it's real gold..."
 );
 
 const Chest = new Item(
@@ -162,7 +168,7 @@ const Kitchen = new Room(
 // TODO: Separate these?
 // Item Placement
 Kitchen.placeItem("Red apple", Apple);
-Kitchen.placeItem("Key", Key);
+Kitchen.placeItem("Silver key", Key);
 Hallway.placeItem("Chest", Chest);
 
 // Room Links
