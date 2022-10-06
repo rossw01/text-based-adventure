@@ -24,11 +24,12 @@ function addToInventory(item) {
 }
 
 class Item {
-  constructor(name, description, placement, contains) {
+  constructor(name, description, placement, contains, onUse) {
     this._name = name;
     this._desc = description;
     this._placement = placement;
     this._contains = contains;
+    this._onUse = onUse;
   }
 }
 
