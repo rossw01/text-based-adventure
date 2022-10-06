@@ -46,7 +46,6 @@ class Room {
 
   placeItem(name, item) {
     this._items[name] = item;
-    console.log(`Added item '${name}' to '${this._name}'`);
   }
 
   examine(item) {
@@ -68,7 +67,8 @@ class Room {
       displayAlert(`Picked up ${item}!`);
       // TODO: Add item to inventory (not yet implemented)
       addToInventory(item);
-      // TODO: Remove item from room
+      delete this._items[item];
+      console.log(this._items);
     } else {
       displayAlert(`Can't find a ${item} to pickup!`);
     }
@@ -98,16 +98,16 @@ class Room {
   }
 }
 
+// Item Setup
 const Apple = new Item("Apple", "It's red and looks delicous");
 const Key = new Item("Key", "Unlocks a door");
 
+// Room Setup
 const Lounge = new Room(
   "Lounge",
   "You are now in the lounge, there is a big sofa.",
   Key
 );
-
-console.log(Lounge._requiredItem);
 
 const Hallway = new Room(
   "Hallway",
@@ -120,10 +120,12 @@ const Kitchen = new Room(
   "You are in the kitchen, there is a table and a countertop"
 );
 
+// TODO: Separate these?
+// Item Placement
 Kitchen.placeItem("Red apple", Apple);
 Kitchen.placeItem("Key", Key);
-// TODO: Separate these
 
+// Room Links
 Kitchen.linkRoom("south", Hallway);
 Kitchen.linkRoom("east", Lounge);
 
@@ -131,6 +133,9 @@ Hallway.linkRoom("north", Kitchen);
 
 Lounge.linkRoom("west", Kitchen);
 
+// Game logic
+
+// Popup to alert user
 function displayAlert(text) {
   alertElement.innerText = text;
 
