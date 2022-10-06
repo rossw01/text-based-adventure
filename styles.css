@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+.description-box {
+  height: 150px;
+  width: 500px;
+  overflow: auto;
+  margin-bottom: 1rem;
+  font-size: 20px;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+}

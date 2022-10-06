@@ -1,9 +1,23 @@
 const inputElement = document.getElementById("inputBox");
 const textElement = document.getElementById("text");
 const alertElement = document.getElementById("alert");
+const descriptionElement = document.getElementById("descriptionBox");
 
 var currentRoom;
 var inventory = {};
+var textHistory = []; // All descriptions outputted to description box will be stored here
+
+function updateDescriptionBox(text) {
+  textHistory.push(text);
+
+  let innerText = "";
+  textHistory.forEach((item) => {
+    innerText += `${item} \n\n`;
+  });
+
+  descriptionElement.innerText = innerText;
+  descriptionElement.scrollTop = descriptionElement.scrollHeight; // Autoscrolls to bottom
+}
 
 function addToInventory(item) {
   inventory[item._name] = item;
@@ -35,6 +49,17 @@ class Room {
     console.log(`Added item '${name}' to '${this._name}'`);
   }
 
+  examine(item) {
+    console.log("Available items:");
+    console.log(this._items);
+
+    if (item in this._items) {
+      updateDescriptionBox(this._items[item]._desc);
+    } else {
+      displayAlert(`Can't find a ${item} to examine!`);
+    }
+  }
+
   get(item) {
     // if key with item string exists in items...
     console.log("Available items:");
@@ -45,7 +70,7 @@ class Room {
       addToInventory(item);
       // TODO: Remove item from room
     } else {
-      displayAlert(`Can't find a ${item}!`);
+      displayAlert(`Can't find a ${item} to pickup!`);
     }
   }
 
@@ -64,7 +89,7 @@ class Room {
         return currentRoom; // Didn't move so we return currentRoom
       } else {
         currentRoom = this._linkedRooms[direction];
-        console.log(`You are now in the ${currentRoom._name}`);
+        updateDescriptionBox(currentRoom._desc);
         return this._linkedRooms[direction];
       }
     }
@@ -117,27 +142,37 @@ function displayAlert(text) {
   alertElement.style.opacity = "0";
 }
 
-function displayRoomInfo(roomToDisplay) {
-  textElement.innerText = roomToDisplay._desc;
+function displayRoomName(roomToDisplay) {
+  textElement.innerText = roomToDisplay._name;
 }
 
 document.addEventListener("keydown", function (event) {
   if (event.key == "Enter") {
     command = inputElement.value;
+    inputElement.value = "";
     const directions = ["north", "south", "east", "west"];
     if (directions.includes(command.toLowerCase())) {
       // MOVEMENT
       currentRoom = currentRoom.move(command);
-      displayRoomInfo(currentRoom);
-      inputElement.value = "";
+      displayRoomName(currentRoom);
     } else if (command.split(" ")[0].toLowerCase() == "get") {
       // GET
-      inputElement.value = "";
-      let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
-      currentRoom.get(item.charAt(0).toUpperCase() + item.substring(1)); // Capitalises first letter of item to get
+      if (command == "get") {
+        displayAlert("Nothing to get!");
+      } else {
+        let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
+        currentRoom.get(item.charAt(0).toUpperCase() + item.substring(1)); // Capitalises first letter of item to get
+      }
+      // EXAMINE
+    } else if (command.split(" ")[0].toLowerCase() == "examine") {
+      if (command == "examine") {
+        updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room
+      } else {
+        let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
+        currentRoom.examine(item.charAt(0).toUpperCase() + item.substring(1));
+      }
     } else {
       alert("That is not a valid command please try again");
-      inputElement.value = "";
     }
   }
 });
@@ -145,7 +180,7 @@ document.addEventListener("keydown", function (event) {
 function startGame() {
   // Def starting room
   currentRoom = Kitchen;
-  displayRoomInfo(currentRoom);
+  displayRoomName(currentRoom);
 }
 
 startGame();
