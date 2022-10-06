@@ -166,6 +166,14 @@ const Cabinet = new Item(
   Lantern
 );
 
+const Sword = new Item(
+  "Sword",
+  "This has definitely not been used in over a century, it would probably break easily.",
+  "There is an old sword mounted on the wall.",
+  undefined,
+  "Your sword has broken already! It was probably just for decorative purposes to be fair."
+);
+
 // Room Setup
 const Lounge = new Room(
   "Lounge",
@@ -195,6 +203,13 @@ const UpstairsDark = new Room(
   false
 );
 
+const FinalRoom = new Room(
+  "Final Room",
+  "There is a goblin here",
+  "Gold key",
+  true
+);
+
 // TODO: Separate these?
 // Item Placement
 Kitchen.placeItem("Apple", Apple);
@@ -215,7 +230,36 @@ UpstairsDark.linkRoom("downstairs", Hallway);
 
 Lounge.linkRoom("west", Kitchen);
 
+function illuminateRoom(text) {
+  currentRoom._isIlluminated = true;
+  currentRoom._desc = text;
+  if (currentRoom._name == "Upstairs") {
+    // Tried to keep code semi-reusable
+    UpstairsDark.linkRoom("north", FinalRoom);
+    UpstairsDark.placeItem("Sword", Sword);
+  }
+
+  updateDescriptionBox(currentRoom._desc);
+  getItemPlacements();
+}
 // Game logic
+function lightRoom() {
+  if (!displayInv().includes("Lantern")) {
+    displayAlert("I don't have a lantern!");
+  } else {
+    if (!currentRoom._isIlluminated) {
+      updateDescriptionBox("You use the lantern and set it down beside you...");
+      delete inventory["Lantern"];
+      if (currentRoom == UpstairsDark) {
+        illuminateRoom(
+          "You now see everything! There is a locked door at the end of the hallway. (North)"
+        );
+      }
+    } else {
+      displayAlert("The room is already illuminated!");
+    }
+  }
+}
 
 // Popup to alert user
 function displayAlert(text) {
@@ -300,6 +344,19 @@ document.addEventListener("keydown", function (event) {
       }
     } else if (command == "inventory") {
       updateDescriptionBox(displayInv());
+    } else if (command.split(" ")[0].toLowerCase() == "use") {
+      let itemToUse = command.substring(command.indexOf(" ") + 1).toLowerCase();
+      if (itemToUse == "lantern") {
+        lightRoom();
+      } else {
+        if (displayInv().toLowerCase().includes(itemToUse)) {
+          // User inputted an item that they have that cant be used
+          displayAlert(`I can't use a ${itemToUse}!`);
+        } else {
+          // User inputted an item that they don't have
+          displayAlert(`I don't have a ${itemToUse}!`);
+        }
+      }
     } else {
       displayAlert("That is not a valid command please try again");
     }
