@@ -350,7 +350,8 @@ function loseGame() {
 }
 
 function throwItem(item) {
-  if (!displayInv().includes(item)) {
+  console.log(inventory);
+  if (!displayInv().toLowerCase().includes(item)) {
     displayAlert(`I don't have a ${item}!`);
   }
   if (currentRoom == FinalRoom && item == "apple") {
@@ -361,8 +362,22 @@ function throwItem(item) {
     updateDescriptionBox("The goblin catches the sword and crushes it to dust");
     delete inventory[item];
   } else {
-    // TODO: drop?
-    displayAlert("I can't throw that!");
+    let itemObj =
+      inventory[item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()];
+
+    itemObj._placement = `There is a ${
+      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
+    } on the floor where it landed.`;
+    currentRoom.placeItem(
+      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase(),
+      itemObj
+    );
+    delete inventory[
+      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
+    ];
+    updateDescriptionBox(`You throw the ${item}!`);
+    updateDescriptionBox(`Nothing happened. The ${item} landed on the floor.`);
+    // displayAlert("I can't throw that!");
   }
 }
 
