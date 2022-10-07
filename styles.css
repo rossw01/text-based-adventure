@@ -11,6 +11,13 @@ body {
 }
 
 .container {
+  background: radial-gradient(
+    circle,
+    rgb(148, 134, 241) 0%,
+    rgba(192, 211, 233, 1) 59%,
+    rgba(218, 221, 219, 1) 100%
+  );
+
   height: 100%;
   width: 100%;
   justify-content: center;
@@ -19,16 +26,32 @@ body {
   flex-direction: column;
 }
 
+h1 {
+  margin-bottom: 0px;
+}
+
 .location {
   display: flex;
 }
 
+.location-text {
+  font-weight: bold;
+}
+
 .description-box {
-  height: 250px;
+  height: 300px;
   width: 500px;
   overflow: auto;
   margin-bottom: 1rem;
   font-size: 18px;
   padding: 0.5rem;
-  border: 1px solid #ccc;
+  border: 1px solid #000;
+  border-radius: 1rem;
+  background-color: rgb(153, 181, 214);
+}
+
+.input-box {
+  width: 500px;
+  border-radius: 5px;
+  font-size: 1.5rem;
 }
