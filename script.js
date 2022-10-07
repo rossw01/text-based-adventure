@@ -142,6 +142,7 @@ class Room {
         return currentRoom; // Didn't move so we return currentRoom
       } else {
         currentRoom = this._linkedRooms[direction];
+        updateDescriptionBox("---");
         updateDescriptionBox(currentRoom._desc);
         getItemPlacements();
         getCharacterPlacements();
@@ -361,8 +362,15 @@ function winGame() {
 }
 
 function loseGame() {
-  updateDescriptionBox("The goblin hits you with his weapon");
-  updateDescriptionBox("You are now dead");
+  if (currentRoom == FinalRoom) {
+    updateDescriptionBox("The goblin hits you with his weapon");
+    updateDescriptionBox("You are now dead");
+  }
+  if (currentRoom == Kitchen) {
+    updateDescriptionBox("Peter is disgraced by your actions!");
+    updateDescriptionBox("He kicks you out of his house.");
+    updateDescriptionBox("You lose.");
+  }
   inputElement.disabled = true;
 }
 
@@ -466,6 +474,7 @@ document.addEventListener("keydown", function (event) {
       // EXAMINE
       if (command == "examine") {
         // If user just types examine, nothing else....
+        updateDescriptionBox("---");
         updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room.
         // Updates the description box so long as there are item placement descriptions to be displayed.
         getItemPlacements();
@@ -507,6 +516,13 @@ document.addEventListener("keydown", function (event) {
           displayAlert("I can't use that!");
         }
       }
+    } else if (
+      (command.toLowerCase() == "hit peter" ||
+        command.toLowerCase() == "punch peter" ||
+        command.toLowerCase() == "fight peter") &&
+      currentRoom == Kitchen
+    ) {
+      loseGame();
     } else {
       displayAlert("That is not a valid command please try again");
     }
