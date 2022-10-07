@@ -53,6 +53,17 @@ class Room {
     this._characters = {};
   }
 
+  speak(name) {
+    name = name.charAt(0).toUpperCase() + name.substring(1).toLowerCase();
+    if (name in this._characters) {
+      updateDescriptionBox(
+        `You speak to ${name}...\nThey reply: "${this._characters[name]._onTalk}"`
+      );
+    } else {
+      displayAlert(`There's no one called ${name} here!`);
+    }
+  }
+
   linkCharacter(name, character) {
     this._characters[name] = character;
   }
@@ -425,6 +436,18 @@ document.addEventListener("keydown", function (event) {
         displayAlert("Nothing to throw!");
       } else {
         throwItem(item);
+      }
+    } else if (
+      command.split(" ")[0].toLowerCase() == "speak" ||
+      command.split(" ")[0].toLowerCase() == "talk"
+    ) {
+      if (command == "speak" || command == "talk") {
+        // if user didn't specify who to talk to...
+        displayAlert("You must specify someone to talk to!");
+      } else {
+        currentRoom.speak(
+          command.substring(command.indexOf(" ") + 1).toLowerCase()
+        );
       }
     } else if (command.split(" ")[0].toLowerCase() == "examine") {
       // EXAMINE
