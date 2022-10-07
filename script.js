@@ -33,6 +33,15 @@ class Item {
   }
 }
 
+class Character {
+  constructor(name, description, placement, onTalk) {
+    this._name = name; // Name in game
+    this._desc = description; // Examine text
+    this._placement = placement; // Where in the room
+    this._onTalk = onTalk; // What will they say
+  }
+}
+
 class Room {
   constructor(name, description, requiredItem, isIlluminated) {
     this._name = name;
@@ -41,6 +50,11 @@ class Room {
     this._items = {};
     this._requiredItem = requiredItem;
     this._isIlluminated = isIlluminated;
+    this._characters = {};
+  }
+
+  linkCharacter(name, character) {
+    this._characters[name] = character;
   }
 
   linkRoom(direction, room) {
@@ -52,17 +66,12 @@ class Room {
   }
 
   examine(item) {
-    // TODO: remove
-    // console.log("Available items in room:");
-    // console.log(this._items);
-    // console.log("Available items in inventory:");
-    // console.log(inventory);
-    // console.log(item);
-
     if (item in inventory) {
       updateDescriptionBox(inventory[item]._desc);
     } else if (item in this._items) {
       updateDescriptionBox(this._items[item]._desc);
+    } else if (item in this._characters) {
+      updateDescriptionBox(this._characters[item]._desc);
     } else {
       displayAlert(`Can't find a ${item} to examine!`);
     }
@@ -118,6 +127,7 @@ class Room {
         currentRoom = this._linkedRooms[direction];
         updateDescriptionBox(currentRoom._desc);
         getItemPlacements();
+        getCharacterPlacements();
 
         return this._linkedRooms[direction];
       }
@@ -210,7 +220,18 @@ const FinalRoom = new Room(
   true
 );
 
+// Characters
+const Peter = new Character(
+  "Peter",
+  "He's old and looks like he probably smells",
+  "There is a man with a nametag that reads 'Peter' sat at the table.",
+  "Go away, I'm reading!"
+);
+
 // TODO: Separate these?
+// Char placement
+Kitchen.linkCharacter("Peter", Peter);
+
 // Item Placement
 Kitchen.placeItem("Apple", Apple);
 Kitchen.placeItem("Silver key", Key);
@@ -241,6 +262,7 @@ function illuminateRoom(text) {
 
   updateDescriptionBox(currentRoom._desc);
   getItemPlacements();
+  getCharacterPlacements();
 }
 // Game logic
 function lightRoom() {
@@ -281,6 +303,16 @@ function getItemPlacements() {
   let out = "";
   for (let item in currentRoom._items) {
     out += currentRoom._items[item]._placement + "\n";
+  }
+  if (out.trim() !== "") {
+    updateDescriptionBox(out.trim());
+  }
+}
+
+function getCharacterPlacements() {
+  let out = "";
+  for (let character in currentRoom._characters) {
+    out += currentRoom._characters[character]._placement + "\n";
   }
   if (out.trim() !== "") {
     updateDescriptionBox(out.trim());
@@ -386,6 +418,7 @@ document.addEventListener("keydown", function (event) {
         updateDescriptionBox(currentRoom._desc); // If nothing to examine, examine the room.
         // Updates the description box so long as there are item placement descriptions to be displayed.
         getItemPlacements();
+        getCharacterPlacements();
       } else {
         let item = command.substring(command.indexOf(" ") + 1).toLowerCase();
         currentRoom.examine(item.charAt(0).toUpperCase() + item.substring(1));
