@@ -309,7 +309,7 @@ function displayAlert(text) {
   alertElement.style.transition = "none";
   alertElement.style.opacity = "1";
   void alertElement.offsetHeight; // Allows us to transition again (for some reason)
-  alertElement.style.transition = "opacity 2.5s";
+  alertElement.style.transition = "opacity 4s";
   alertElement.style.opacity = "0";
 }
 
