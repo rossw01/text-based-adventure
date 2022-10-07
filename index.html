@@ -9,23 +9,30 @@
     <script src="script.js" defer></script>
   </head>
   <body>
-    <h1>OOP Game</h1>
-    <p id="text"></p>
-    <div id="descriptionBox" class="description-box">
-      Welcome!<br />
-      Here are some commands for you to try to get you started:<br />
-      <span style="font-weight: bold"
-        >north, south, east, west, get, examine</span
-      ><br />
-      You can also add a word after some of the commands.<br />
-      Use
-      <span style="font-style: italic; font-weight: bold">'examine'</span> at
-      any point to examine your surroundings. <br />
-      Give
-      <span style="font-style: italic; font-weight: bold">'examine apple'</span>
-      a try! <br />
+    <div class="container">
+      <h1>OOP Game</h1>
+      <div class = "location">
+        <p class = "location-label">Current Location:&nbsp;</p>
+        <p id="text" class =></p>
+      </div>
+      <div id="descriptionBox" class="description-box">
+        Welcome!<br />
+        Here are some of the commands available to you duing the game:<br /><br />
+        <span style="font-style: italic; font-weight: bold"
+          >north, south, east, west, upstairs, downstairs, get, examine, throw, talk, speak, open, use.</span
+        ><br /><br />
+        You can also add a word after some of the commands.<br />
+        For example, you can use
+        <span style="font-style: italic; font-weight: bold">'examine itemname'</span> at
+        any point to an item. Or just use <span style="font-style: italic; font-weight: bold">"examine"</span> to examine the room. <br />
+        Give
+        <span style="font-style: italic; font-weight: bold"
+          >'examine apple'</span
+        >
+        a try! <br />
+      </div>
+      <input type="text" id="inputBox" placeholder="Input text here" />
+      <p id="alert"></p>
     </div>
-    <input type="text" id="inputBox" placeholder="Input text here" />
-    <p id="alert"></p>
   </body>
 </html>
