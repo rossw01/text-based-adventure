@@ -104,19 +104,25 @@ class Room {
     }
   }
 
-  // TODO: Dont let player pick up something that contains something
   get(item) {
-    // if key with item string exists in items...
-    console.log("Available items:");
-    console.log(this._items);
-    if (item in this._items) {
-      displayAlert(`Picked up ${item}!`);
-      // TODO: Add item to inventory (not yet implemented)
-      addToInventory(this._items[item]);
-      delete this._items[item];
-      console.log(this._items);
-    } else {
+    // In case of get heavy item (contains something else)
+    if (!(item in this._items)) {
       displayAlert(`Can't find a ${item} to pickup!`);
+    } else if (this._items[item]._contains != undefined) {
+      displayAlert(
+        `There's no chance of me picking up a ${item} all by myself!`
+      );
+    } else {
+      // if key with item string exists in items...
+      console.log("Available items:");
+      console.log(this._items);
+      if (item in this._items) {
+        displayAlert(`Picked up ${item}!`);
+        // TODO: Add item to inventory (not yet implemented)
+        addToInventory(this._items[item]);
+        delete this._items[item];
+        console.log(this._items);
+      }
     }
   }
 
@@ -239,7 +245,7 @@ const Peter = new Character(
   "Go away, I'm reading!"
 );
 
-// TODO: Separate these?
+// TODO: Separate these to different file if possible
 // Char placement
 Kitchen.linkCharacter("Peter", Peter);
 
@@ -351,44 +357,51 @@ function winGame() {
     "Goblins are allergic to apples. The Goblin is now dead. 😵"
   );
   updateDescriptionBox("You win!");
-  //TODO:
+  inputElement.disabled = true;
 }
 
 function loseGame() {
   updateDescriptionBox("The goblin hits you with his weapon");
   updateDescriptionBox("You are now dead");
-  // TODO: disable input
+  inputElement.disabled = true;
 }
 
+// TODO: Move to item class
 function throwItem(item) {
   console.log(inventory);
   if (!displayInv().toLowerCase().includes(item)) {
     displayAlert(`I don't have a ${item}!`);
-  }
-  if (currentRoom == FinalRoom && item == "apple") {
-    winGame();
-  }
-  if (currentRoom == FinalRoom && item == "sword") {
-    // Secret!
-    updateDescriptionBox("The goblin catches the sword and crushes it to dust");
-    delete inventory[item];
   } else {
-    let itemObj =
-      inventory[item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()];
+    if (currentRoom == FinalRoom && item == "apple") {
+      winGame();
+    } else if (currentRoom == FinalRoom && item == "sword") {
+      // Secret!
+      updateDescriptionBox(
+        "The goblin catches the sword and crushes it to dust"
+      );
+      delete inventory[item];
+    } else {
+      let itemObj =
+        inventory[
+          item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
+        ];
 
-    itemObj._placement = `There is a ${
-      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
-    } on the floor where it landed.`;
-    currentRoom.placeItem(
-      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase(),
-      itemObj
-    );
-    delete inventory[
-      item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
-    ];
-    updateDescriptionBox(`You throw the ${item}!`);
-    updateDescriptionBox(`Nothing happened. The ${item} landed on the floor.`);
-    // displayAlert("I can't throw that!");
+      itemObj._placement = `There is a ${
+        item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
+      } on the floor where it landed.`;
+      currentRoom.placeItem(
+        item.charAt(0).toUpperCase() + item.substring(1).toLowerCase(),
+        itemObj
+      );
+      delete inventory[
+        item.charAt(0).toUpperCase() + item.substring(1).toLowerCase()
+      ];
+      updateDescriptionBox(`You throw the ${item}!`);
+      updateDescriptionBox(
+        `Nothing happened. The ${item} landed on the floor.`
+      );
+      // displayAlert("I can't throw that!");
+    }
   }
 }
 
